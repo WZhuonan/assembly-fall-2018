@@ -1,0 +1,24 @@
+			.text
+			.equ PS2_DATA, 0xFF200100
+			.equ PS2_CONTROL, 0xFF200104
+			.global read_PS2_data_ASM
+
+read_PS2_data_ASM: 
+			LDR R1, =PS2_DATA
+			LDR R2, [R1]			// GET THE DATA
+			MOV R3, #0x8000			// CHECK RVALID
+			AND R4, R2, R3
+
+			CMP R4, #0
+			BEQ UNVALID				// IF RVALID IS 0 THEN IT'S UNVALID
+			B VALID					// IF RVALID IS 1 THEN IT'S VALID
+
+UNVALID:	MOV R0, #0				// IF UNVALID THEN RETURN 0
+			BX LR
+
+VALID:		MOV R4, #255			// 11111111
+			AND R4, R4, R2			
+			STRB R4, [R0]			// SRORE DATA TO R0
+			MOV R0, #1				// RETURN 1
+			BX LR
+			
